@@ -138,6 +138,9 @@ a { color: white !important; text-decoration: underline !important;}
 						<p>所以作者稱為 CDD (Conference Driven Development)</p>
 					</section>
 				</section>
+				<section data-transition="slide" data-background="#4d7e65">
+					<img src="img/redux-2.png" style="background-color: #fff" />
+				</section>
 
 				<section data-transition="slide" data-background="#b5533c">
                     <section>
@@ -236,8 +239,7 @@ function messageReducer(state = initialState, action) {
                     <section>
                     	<p>`createStore` 的方式是把 reducer 傳進去</p>
 
-<pre><code class="lang-js">
-import { createStore } from 'redux';
+<pre><code class="lang-js">import { createStore } from 'redux';
 import messageReducer from '../reducers/messages';
 const store = createStore(messageReducer);
 </code></pre>
@@ -245,8 +247,7 @@ const store = createStore(messageReducer);
                     <section>
                     	<p>實際會有很多不同資料的 reducer，所以需要用 `combineReducers` 來結合他們</p>
 
-<pre><code class="lang-js">
-import { createStore, combineReducers } from 'redux';
+<pre><code class="lang-js">import { createStore, combineReducers } from 'redux';
 import * as reducers from '../reducers';
 const reducer = combineReducers(reducers);
 const store = createStore(reducer);
@@ -259,8 +260,7 @@ const store = createStore(reducer);
 
                     	<p>雖然大部份時候並不會直接這樣寫。</p>
 
-<pre><code class="lang-js">
-store.dispatch(sendMessage('Hello'));
+<pre><code class="lang-js">store.dispatch(sendMessage('Hello'));
 </code></pre>
                     </section>
                     <section>
@@ -268,8 +268,7 @@ store.dispatch(sendMessage('Hello'));
 
                     	<p>可以取得 store 現在的 state。</p>
 
-<pre><code class="lang-js">
-store.getState();
+<pre><code class="lang-js">store.getState();
 </code></pre>
                     </section>
                 </section>
@@ -282,8 +281,7 @@ store.getState();
                     <section>
                     	<p>可以使用 `applyMiddleware` util</p>
 
-<pre><code class="lang-js">
-import { createStore, applyMiddleware } from 'redux';
+<pre><code class="lang-js">import { createStore, applyMiddleware } from 'redux';
 
 const store =
 applyMiddleware(promise, thunk, observable)(createStore)(reducer);
@@ -292,8 +290,7 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                     <section>
                         <p><code>dispatch => dispatch'</code></p>
                         <p>讓 dispatch 經過一個個的 middleware decorate</p>
-<pre><code class="lang-js">
-const store =
+<pre><code class="lang-js">const store =
 applyMiddleware(promise, thunk, observable)(createStore)(reducer);
 // store.dispatch => promise(thunk(observable(store.dispatch)));
 </code></pre>
@@ -303,8 +300,7 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
 
                     	<p>可以讓 store dispatch thunk</p>
 
-<pre><code class="lang-js">
-function sendMessageAsync(message) {
+<pre><code class="lang-js">function sendMessageAsync(message) {
   return dispatch => {
     setTimeout(() => {
       dispatch(sendMessage(message));
@@ -318,8 +314,7 @@ function sendMessageAsync(message) {
 
                     	<p>可以讓 store dispatch promise</p>
 
-<pre><code class="lang-js">
-function sendMessageAsync(message) {
+<pre><code class="lang-js">function sendMessageAsync(message) {
   return dispatch => {
       dispatch(new Promise((resolve, reject)) => {
         setTimeout(() => {
@@ -355,10 +350,9 @@ function sendMessageAsync(message) {
                         <p style="font-size: 2em">Provider</p>
                     </section>
                     <section>
-Provider 用來在 RootComponent 外再包一層，並把 store 用 react context 傳下去：
+                    	<p>Provider 用來在 RootComponent 外再包一層，並把 store 用 react context 傳下去：</p>
 
-<pre><code class="lang-js">
-&lt;Provider store={store}&gt;
+<pre><code class="lang-js">&lt;Provider store={store}&gt;
   &lt;MyRootComponent&gt;
 &lt;/Provider&gt;
 </code></pre>
@@ -372,8 +366,7 @@ Provider 用來在 RootComponent 外再包一層，並把 store 用 react contex
                     <section>
 connect 用來把特定的 state 從 context 裡的 store select 出來，把 event listener 等等自動處理好，並把 dispatch 當 props 傳下去：
 
-<pre><code class="lang-js">
-@connect(state => ({
+<pre><code class="lang-js">@connect(state => ({
   user: state.user
 }))
 class MySmartComponent extends React.Component {
@@ -393,10 +386,9 @@ class MySmartComponent extends React.Component {
                         <p>Redux 還有一個可以方便去使用 ActionCreator 的 util</p>
                     </section>
                     <section>
-把 dispatch 包進去：
+                    	<p>把 dispatch 包進去：</p>
 
-<pre><code class="lang-js">
-import { bindActionCreators } from 'redux';
+<pre><code class="lang-js">import { bindActionCreators } from 'redux';
 
 @connect(state => ({
   user: state.user
@@ -428,8 +420,7 @@ class MySmartComponent extends React.Component {
 
 	他會自動幫你包進 Connect Component</p>
 
-<pre><code class="lang-js">
-function mapStateToProps(state) {
+<pre><code class="lang-js">function mapStateToProps(state) {
   return {
     user: state.user
   };
@@ -462,8 +453,7 @@ export default connect(mapStateToProps)(MyDumbComponent)
                     <section>
                     	<p>也傳遞包 dispatch 的 actionCreator props 下去：</p>
 
-<pre><code class="lang-js">
-function mapStateToProps(state) {
+<pre><code class="lang-js">function mapStateToProps(state) {
   return {
     user: state.user
   };
@@ -484,8 +474,7 @@ export default connect(
                     <section>
                     	<p>最後一個：</p>
 
-<pre><code class="lang-js">
-function mergeProps(stateProps, dispatchProps, parentProps) {
+<pre><code class="lang-js">function mergeProps(stateProps, dispatchProps, parentProps) {
   return {
     ...stateProps,
     ...dispatchProps,
@@ -509,8 +498,7 @@ export default connect(
                         <p>v0.8.0 也可以 bindActionCreators</p>
                     </section>
                     <section>
-<pre><code class="lang-js">
-function mapStateToProps(state) {
+<pre><code class="lang-js">function mapStateToProps(state) {
   return {
     user: state.user
   };
