@@ -1,0 +1,7 @@
+.DS_Store
+.svn
+log/*.log
+tmp/**
+.sass-cache
+css/reveal.min.css
+js/reveal.min.js
