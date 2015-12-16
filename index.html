@@ -144,29 +144,34 @@ a { color: white !important; text-decoration: underline !important;}
 
 				<section data-transition="slide" data-background="#b5533c">
                     <section>
-                        <p style="font-size: 1.5em">Action</p>
-                        <p>只是個普通的 js object</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Action</p>
+                        <p>只是個普通的 JS Object</p>
+                        <p>一定要有一個 type</p>
 <pre><code class="lang-js">{
   type: SEND_MESSAGE,
   payload: {
     text: 'Hello world'
   }
 }</code></pre>
+						<p>把資料傳給 Store 的唯一手段</p>
+                        <p>表達修改 State 的意圖</p>
                     </section>
                     <section>
-                        <p style="font-size: 1.5em">Flux Standard Action</p>
-                        <p><a href="https://github.com/acdlite/flux-standard-action" target="_blank">Flux Standard Action</a> 有一個普遍的 action 定義，<br>包括 meta, error 等欄位</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Flux Standard Action</p>
+                        <p><a href="https://github.com/acdlite/flux-standard-action" target="_blank">Flux Standard Action</a> 有一個普遍的 action 定義</p>
+                        <p>包括 meta, error 等欄位</p>
                     </section>
                 </section>
 
                 <section data-transition="slide" data-background="#4d7e65">
                     <section>
-                        <p style="font-size: 1.5em">Action Creators</p>
-                        <p>通常寫在 Actions 或 ActionCreators 命名的檔案中</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Action Creators</p>
+                        <p>通常寫在 XxxxActions 或 XxxxActionCreators 命名的檔案中</p>
                         <p>小心盡量不要跟 Action 搞混</p>
                     </section>
                     <section>
-                        <p>一個普通的 Action Creator，<br />就是製造 Action 的 pure function</p>
+	                    <p>一個普通的 Action Creator</p>
+	                    <p>就是製造 Action 的 Pure Function</p>
 
 <pre><code class="lang-js">function sendMessage(text) {
   return {
@@ -178,7 +183,7 @@ a { color: white !important; text-decoration: underline !important;}
 }</code></pre>
                     </section>
                     <section>
-                        <p>這樣的 pure function 很好測試</p>
+                        <p>這樣的 Pure Function 很好測試</p>
 
 <pre><code class="lang-js">expect(sendMessage('Hello')).to.deep.equal({
     type: SEND_MESSAGE,
@@ -188,28 +193,40 @@ a { color: white !important; text-decoration: underline !important;}
 });</code></pre>
                     </section>
                     <section>
-                        <p>實際 dispatch action</p>
+                        <p>實際 dispatch Action</p>
 
-<pre><code class="lang-js">dispatch(sendMessage('Hello'));</code></pre>
+<pre><code class="lang-js">// 先不管 dispatch 從哪來
+dispatch(sendMessage('Hello'));</code></pre>
                     </section>
                     <section>
-                        <p>使用 thunkMiddleware, PromiseMiddleware 後，<br>就可以延伸的 ActionCreator 的功能，<br>這邊先不做敘述</p>
+                    	<p>使用</p>
+                    	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">thunkMiddleware (redux-thunk)</a></p>
+                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blankredu">PromiseMiddleware (redux-promise)</a></p>
+	                    <p>就可以延伸的 ActionCreator 的功能</p>
+	                    <p>這邊先不做敘述</p>
                     </section>
                 </section>
 
                 <section data-transition="slide" data-background="#b5533c">
                     <section>
-                        <p style="font-size: 1.5em">Reducer</p>
-                        <p>給 store 初始的 state，並根據收到的 action 回傳新的 state</p>
-                        <p>就像是原本的 store 的一部分工作</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Reducer</p>
+                        <p>給 Store 初始的 State</p>
+                        <p>並根據收到的 Action 回傳新的 State</p>
+                        <p>就像是原本的 Store 的一部分工作</p>
                     </section>
                     <section>
                         <p><code>(previousState, action) => newState</code></p>
-                        <p>每次收到 dispatch 的 action 就會觸發，根據原本的 previousState，來回傳新的 newState</p>
-                        <p>這樣的 functional 的做法，可以更簡潔的表達如何變更 state</p>
                     </section>
                     <section>
-                        <p>這是個 no side effect 的 function，<br>不要去改 previousState，<br>會害 time travel 等需要前面 state 的功能壞掉</p>
+                    <p>每次收到 dispatch 的 Action 就會觸發</p>
+                    <p>根據原本的 previousState 和 Action，回傳新的 newState</p>
+                    <p>這樣的 Functional 的做法</p>
+                    <p>可以更簡潔的表達如何變更 State</p>
+                    </section>
+                    <section>
+                    <p>這是個沒有 Side Effect 的 Function</p>
+                    <p>不要去改 previousState</p>
+                    <p>會使 Time Travel 等需要前面 State 的功能壞掉</p>
 
 <pre><code class="lang-js">const initialState = { message: '' };
 
@@ -220,24 +237,30 @@ function messageReducer(state = initialState, action) {
         message: action.text
       };
     default:
-      return state;
+      return state; // 沒有做任何事也要回傳原本的
   }
 }</code></pre>
                     </section>
 
                     <section>
-                        <p style="text-align: left">在一開始的時候 Redux 會先<br> dispatch 一個<code>@@redux/INIT</code> action 來初始化 state，<br><code>@@namespace/EVENT_NAME</code> 是<br>目前 private event 的命名規範，<br>不要試圖去聽這些 event</p>
+                    	<p>在一開始的時候 Redux 會 dispatch</p>
+                    	<p><span style="color: #ee5"><code>@@redux/INIT</code></span> Action 來初始化 State</p>
+                    </section>
+                    <section>
+                    	<p style="color: #ee5"><code>@@namespace/EVENT_NAME</code></p>
+                    	<p>是目前 Private Event 的命名規範</p>
+                    	<p>不要試圖去聽這些 Event</p>
                     </section>
                 </section>
 
 
                 <section data-transition="slide" data-background="#4d7e65">
                     <section>
-                        <p style="font-size: 1.5em">Store</p>
-                        <p>應用程式保存 state 的地方，Redux 只有一個</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Store</p>
+                        <p>應用程式保存 State 的地方，Redux 只有一個</p>
                     </section>
                     <section>
-                    	<p>`createStore` 的方式是把 reducer 傳進去</p>
+                    	<p>建立 Store 的方式是把 reducer 傳進去 <code style="color: #ee5">createStore</code></p>
 
 <pre><code class="lang-js">import { createStore } from 'redux';
 import messageReducer from '../reducers/messages';
@@ -245,26 +268,39 @@ const store = createStore(messageReducer);
 </code></pre>
                     </section>
                     <section>
-                    	<p>實際會有很多不同資料的 reducer，所以需要用 `combineReducers` 來結合他們</p>
+                    	<p>實際會有很多不同資料的 reducer</p>
+                    	<p>所以需要用 <code style="color: #ee5">combineReducers</code> 來結合他們</p>
 
-<pre><code class="lang-js">import { createStore, combineReducers } from 'redux';
-import * as reducers from '../reducers';
-const reducer = combineReducers(reducers);
+<pre><code class="lang-js">// reducers/index.js
+import { combineReducers } from 'redux';
+import todos from './todos';
+import counter from './counter';
+
+export default combineReducers({
+  todos,
+  counter
+});
+
+// App.js
+import { createStore } from 'redux';
+import reducer from './reducers/index';
+
 const store = createStore(reducer);
 </code></pre>
                     </section>
                     <section>
-                    	<p style="font-size: 1.5em">dispatch</p>
+                    	<p style="font-size: 1.5em; color: #B2E1EA">dispatch</p>
 
-                    	<p>這是比較 Low-level 的 API，不過還是值得一提，dispatch 其實長在 store 上。</p>
+                    	<p>這是比較 Low-level 的 API</p>
+                    	<p>不過還是值得一提，dispatch 其實在 store 上面</p>
 
-                    	<p>雖然大部份時候並不會直接這樣寫。</p>
+                    	<p>雖然大部份時候並不會直接這樣寫</p>
 
 <pre><code class="lang-js">store.dispatch(sendMessage('Hello'));
 </code></pre>
                     </section>
                     <section>
-                    	<p style="font-size: 1.5em">getState</p>
+                    	<p style="font-size: 1.5em; color: #B2E1EA">getState</p>
 
                     	<p>可以取得 store 現在的 state。</p>
 
@@ -275,30 +311,33 @@ const store = createStore(reducer);
 
                 <section data-transition="slide" data-background="#b5533c">
                     <section>
-                        <p style="font-size: 1.5em">Middleware</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">Middleware</p>
                         <p>用來延伸 dispatch 的功能</p>
                     </section>
                     <section>
-                    	<p>可以使用 `applyMiddleware` util</p>
+                    	<p>使用 <code style="color: #ee5">applyMiddleware</code> util</p>
 
 <pre><code class="lang-js">import { createStore, applyMiddleware } from 'redux';
 
 const store =
 applyMiddleware(promise, thunk, observable)(createStore)(reducer);
+// applyMiddleware 可以 Decorate createStore
 </code></pre>
                     </section>
                     <section>
                         <p><code>dispatch => dispatch'</code></p>
-                        <p>讓 dispatch 經過一個個的 middleware decorate</p>
+                    </section>
+                    <section>
+                        <p>讓 dispatch 經過一個個的 Middleware Decorate</p>
 <pre><code class="lang-js">const store =
 applyMiddleware(promise, thunk, observable)(createStore)(reducer);
 // store.dispatch => promise(thunk(observable(store.dispatch)));
 </code></pre>
                     </section>
                     <section>
-                    	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">gaearon/redux-thunk</a> 這個 middleware</p>
+                    	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">redux-thunk</a> 這個 Middleware</p>
 
-                    	<p>可以讓 store dispatch thunk</p>
+                    	<p>讓 Store 可以 dispatch Thunk</p>
 
 <pre><code class="lang-js">function sendMessageAsync(message) {
   return dispatch => {
@@ -310,9 +349,9 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
 </code></pre>
                     </section>
                     <section>
-                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blank">acdlite/redux-promise</a> 這個 middleware</p>
+                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blank">redux-promise</a> 這個 middleware</p>
 
-                    	<p>可以讓 store dispatch promise</p>
+                    	<p>讓 Store 可以 dispatch Promise</p>
 
 <pre><code class="lang-js">function sendMessageAsync(message) {
   return dispatch => {
@@ -325,18 +364,23 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
 }
 </code></pre>
                     </section>
+                    <section>
+                    	<p>非同步的地方讓 ActionCreator 去做</p>
+                    	<p>Reducer 是完全同步的</p>
+                    </section>
                 </section>
 
                 <section data-transition="slide" data-background="#4d7e65">
                     <section>
-                        <p style="font-size: 1.5em">View</p>
-                        <p>Redux 本身並不依賴特定 view layer，<br>所以可以跟任何 view layer 去結合</p>
+                        <p style="font-size: 1.5em; color: #B2E1EA">View</p>
+                        <p>Redux 本身並不依賴特定 View Layer</p>
+                        <p>所以可以跟任何 View Layer 去結合</p>
                     </section>
                     <section>
                         <p><a href="https://github.com/gaearon/react-redux" target="_blank">react-redux</a> 就是 react 跟 redux 的介接</p>
                     </section>
                     <section>
-                        <p>他提供兩個東西：</p>
+                        <p>提供兩個東西：</p>
                         <ul>
                             <li>Provider</li>
                             <li>connect</li>
@@ -350,7 +394,8 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                         <p style="font-size: 2em">Provider</p>
                     </section>
                     <section>
-                    	<p>Provider 用來在 RootComponent 外再包一層，並把 store 用 react context 傳下去：</p>
+                    	<p>Provider 用來在 RootComponent 外再包一層</p>
+                    	<p>並把 Store 用 React Context 傳下去：</p>
 
 <pre><code class="lang-js">&lt;Provider store={store}&gt;
   &lt;MyRootComponent&gt;
@@ -364,17 +409,34 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                         <p style="font-size: 2em">connect</p>
                     </section>
                     <section>
-connect 用來把特定的 state 從 context 裡的 store select 出來，把 event listener 等等自動處理好，並把 dispatch 當 props 傳下去：
+                    	<p>connect 用來</p>
+                    	<p>把特定的 State 從 Context 裡的 Store Select 出來</p>
+                    	<p>把 Event Handler 綁進來</p>
+                    	<p>並它們當 props 傳下去：</p>
 
-<pre><code class="lang-js">@connect(state => ({
+<pre><code class="lang-js">class MyComponent extends React.Component {
+  render() {
+    const { dispatch, user } = this.props;
+    // connect 沒給第二個參數時 dispatch 會預設當 props 傳下來
+    //..
+  }
+}
+
+expect default connect(state => ({
+  user: state.user
+}))(MyComponent);
+</code></pre>
+                    </section>
+                    <section>
+<pre><code class="lang-js">// 也可以用 decorator 的寫法，不過官方不推薦..
+@connect(state => ({
   user: state.user
 }))
-class MySmartComponent extends React.Component {
-
-    render() {
-        const { dispatch, user } = this.props;
-        //..
-    }
+expect default class MyComponent extends React.Component {
+  render() {
+    const { dispatch, user } = this.props;
+    //..
+  }
 }
 </code></pre>
                     </section>
@@ -382,7 +444,7 @@ class MySmartComponent extends React.Component {
 
                 <section data-transition="slide" data-background="#b5533c">
                     <section>
-                        <p>bindActionCreators</p>
+                        <p style="font-size: 1.5em">bindActionCreators</p>
                         <p>Redux 還有一個可以方便去使用 ActionCreator 的 util</p>
                     </section>
                     <section>
@@ -513,8 +575,6 @@ export default connect(
     mapDispatchToProps
 )(MyDumbComponent)
 </code></pre>
-
-	<p>跟以前用法幾乎一樣！</p>
                     </section>
                 </section>
 
@@ -522,14 +582,13 @@ export default connect(
 					<section>
 						<p style="font-size: 1.5em">Redux 優點</p>
 						<ol>
-							<li>所有東西 (Stores, Action Creators, config) 都可以 hot reload</li>
-							<li>防止一些常見 anti-patterns</li>
-							<li>容易做 universal，沒用到 sigleton 而且資料可以 rehydrated</li>
-							<li>可以用任何形式保存資料：JS objects, arrays, ImmutableJS..</li>
-							<li>簡化至一個 Store，不用思考個別 Store</li>
-							<li>提供 redux-devtools Time travel 功能跟容易實作其他功能的介面</li>
-							<li>可以用 middleware 擴充 dispatch</li>
-							<li>不用 mock 就很容易測試</li>
+							<li>所有東西都 Hot Reloadable</li>
+							<li>容易做 Universal，沒用到 Sigleton 而且資料可以 rehydrated</li>
+							<li>可以用任何形式保存資料：JS Objects, Arrays, ImmutableJS..</li>
+							<li>簡化至一個 Store</li>
+							<li>提供 redux-devtools Time travel 功能</li>
+							<li>可以用 Middleware 擴充 dispatch</li>
+							<li>不用 Mock 就很容易測試</li>
 						</ol>
 					</section>
 					<section>
