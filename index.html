@@ -139,6 +139,25 @@ a { color: white !important; text-decoration: underline !important;}
 					</section>
 				</section>
 				<section data-transition="slide" data-background="#4d7e65">
+					<p style="font-size: 2em">Redux 三大原則</p>
+				</section>
+
+				<section data-transition="slide" data-background="#b5533c">
+					<section>
+						<p>唯一真相來源 (Single source of truth)</p>
+					</section>
+					<section>
+						<p>State 是唯讀的 (State is read-only)</p>
+					</section>
+					<section>
+						<p>變更被寫成 pure functions <br />(Changes are made with pure functions)</p>
+					</section>
+					<section>
+						<p>詳細可參考<a href="http://chentsulin.github.io/redux/docs/introduction/ThreePrinciples.html" target="_blank">這裡</a></p>
+					</section>
+				</section>
+
+				<section data-transition="slide" data-background="#4d7e65">
 					<img src="img/redux-2.png" style="background-color: #fff" />
 				</section>
 
@@ -161,6 +180,16 @@ a { color: white !important; text-decoration: underline !important;}
                         <p><a href="https://github.com/acdlite/flux-standard-action" target="_blank">Flux Standard Action</a> 有一個普遍的 action 定義</p>
                         <p>包括 meta, error 等欄位</p>
                     </section>
+                    <section>
+                    	<p>可以宣告為常數</p>
+                    	<p>放在 ActionCreator 或 額外的 actionTypes 檔案</p>
+<pre><code class="lang-js">export const ADD_TODO = 'ADD_TODO';
+export const COMPLETE_TODO = 'COMPLETE_TODO';
+export const SET_VISIBILITY_FILTER = 'SET_VISIBILITY_FILTER';</code></pre>
+                    </section>
+                    <section>
+						<p>詳細可參考<a href="http://chentsulin.github.io/redux/docs/basics/Actions.html" target="_blank">這裡</a></p>
+					</section>
                 </section>
 
                 <section data-transition="slide" data-background="#4d7e65">
@@ -170,7 +199,21 @@ a { color: white !important; text-decoration: underline !important;}
                         <p>小心盡量不要跟 Action 搞混</p>
                     </section>
                     <section>
-	                    <p>一個普通的 Action Creator</p>
+	                    <p>一個傳統 Flux 的 Action Creator</p>
+	                    <p>會製造 Action 並 dispatch</p>
+
+<pre><code class="lang-js">function sendMessage(text) {
+  const action = {
+    type: SEND_MESSAGE,
+    payload: {
+      text
+    }
+  };
+  dispatch(action); // 注意這裡，這裡就不是 Pure 的
+}</code></pre>
+                    </section>
+                    <section>
+	                    <p>Redux 中一個普通的 Action Creator</p>
 	                    <p>就是製造 Action 的 Pure Function</p>
 
 <pre><code class="lang-js">function sendMessage(text) {
@@ -200,8 +243,8 @@ dispatch(sendMessage('Hello'));</code></pre>
                     </section>
                     <section>
                     	<p>使用</p>
-                    	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">thunkMiddleware (redux-thunk)</a></p>
-                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blankredu">PromiseMiddleware (redux-promise)</a></p>
+                    	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">Thunk Middleware (redux-thunk)</a></p>
+                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blankredu">Promise Middleware (redux-promise)</a></p>
 	                    <p>就可以延伸的 ActionCreator 的功能</p>
 	                    <p>這邊先不做敘述</p>
                     </section>
@@ -212,16 +255,20 @@ dispatch(sendMessage('Hello'));</code></pre>
                         <p style="font-size: 1.5em; color: #B2E1EA">Reducer</p>
                         <p>給 Store 初始的 State</p>
                         <p>並根據收到的 Action 回傳新的 State</p>
-                        <p>就像是原本的 Store 的一部分工作</p>
+                        <p>就像是傳統 Flux 的 Store 的一部分工作</p>
                     </section>
                     <section>
                         <p><code>(previousState, action) => newState</code></p>
                     </section>
                     <section>
-                    <p>每次收到 dispatch 的 Action 就會觸發</p>
-                    <p>根據原本的 previousState 和 Action，回傳新的 newState</p>
-                    <p>這樣的 Functional 的做法</p>
-                    <p>可以更簡潔的表達如何變更 State</p>
+<pre><code class="lang-js">// 原理類似這樣
+const newState = reducer(previousState, action);</code></pre>
+                    </section>
+                    <section>
+	                    <p>每次收到 dispatch 的 Action 就會觸發</p>
+	                    <p>根據原本的 previousState 和 Action，回傳新的 newState</p>
+	                    <p>這樣的 Functional 的做法</p>
+	                    <p>可以更簡潔的表達如何變更 State</p>
                     </section>
                     <section>
                     <p>這是個沒有 Side Effect 的 Function</p>
@@ -234,12 +281,31 @@ function messageReducer(state = initialState, action) {
   switch (action.type) {
     case SEND_MESSAGE:
       return {
-        message: action.text
+        message: action.payload.text
       };
     default:
       return state; // 沒有做任何事也要回傳原本的
   }
 }</code></pre>
+                    </section>
+                    <section>
+                        <p>這樣的 Pure Function 很好測試</p>
+
+<pre><code class="lang-js">// Reducer 了解的 Action
+expect(messageReducer(null, {
+  type: SEND_MESSAGE,
+  payload: {
+    text: 'Hello'
+  }
+})).to.deep.equal({ message: 'Hello' });
+
+// Reducer 不了解的 Action
+expect(messageReducer({ message: 'Hello' }, {
+  type: UNKNOWN,
+  payload: {
+    text: 'Hello'
+  }
+})).to.deep.equal({ message: 'Hello' });</code></pre>
                     </section>
 
                     <section>
@@ -251,6 +317,9 @@ function messageReducer(state = initialState, action) {
                     	<p>是目前 Private Event 的命名規範</p>
                     	<p>不要試圖去聽這些 Event</p>
                     </section>
+                    <section>
+						<p>詳細可參考<a href="http://chentsulin.github.io/redux/docs/basics/Reducers.html" target="_blank">這裡</a></p>
+					</section>
                 </section>
 
 
@@ -289,12 +358,17 @@ const store = createStore(reducer);
 </code></pre>
                     </section>
                     <section>
+<pre><code class="lang-js">// 第二個參數可用來當作初始的 state
+const store = createStore(todoApp, window.STATE_FROM_SERVER);
+</code></pre>
+                    </section>
+                    <section>
                     	<p style="font-size: 1.5em; color: #B2E1EA">dispatch</p>
 
-                    	<p>這是比較 Low-level 的 API</p>
-                    	<p>不過還是值得一提，dispatch 其實在 store 上面</p>
+                    	<p>dispatch 是 Store 比較 Low-level 的 API</p>
+                    	<p>不過還是值得一提</p>
 
-                    	<p>雖然大部份時候並不會直接這樣寫</p>
+                    	<p>雖然通常並不會直接這樣寫</p>
 
 <pre><code class="lang-js">store.dispatch(sendMessage('Hello'));
 </code></pre>
@@ -302,11 +376,25 @@ const store = createStore(reducer);
                     <section>
                     	<p style="font-size: 1.5em; color: #B2E1EA">getState</p>
 
-                    	<p>可以取得 store 現在的 state。</p>
+                    	<p>可以取得 store 現在的 state</p>
 
 <pre><code class="lang-js">store.getState();
 </code></pre>
                     </section>
+                    <section>
+                    	<p style="font-size: 1.5em; color: #B2E1EA">subscribe</p>
+
+                    	<p>可以監聽 store state 的改變</p>
+
+<pre><code class="lang-js">// 每次 state 變更，就印出它
+const unsubscribe = store.subscribe(() =>
+  console.log(store.getState())
+)
+</code></pre>
+                    </section>
+                    <section>
+						<p>詳細可參考<a href="http://chentsulin.github.io/redux/docs/basics/Store.html" target="_blank">這裡</a></p>
+					</section>
                 </section>
 
                 <section data-transition="slide" data-background="#b5533c">
@@ -380,11 +468,7 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                         <p><a href="https://github.com/gaearon/react-redux" target="_blank">react-redux</a> 就是 react 跟 redux 的介接</p>
                     </section>
                     <section>
-                        <p>提供兩個東西：</p>
-                        <ul>
-                            <li>Provider</li>
-                            <li>connect</li>
-                        </ul>
+                        <p>提供 Provider 和 connect 兩個東西</p>
                     </section>
                 </section>
 
@@ -395,9 +479,12 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                     </section>
                     <section>
                     	<p>Provider 用來在 RootComponent 外再包一層</p>
-                    	<p>並把 Store 用 React Context 傳下去：</p>
+                    	<p>並把 Store 用 React Context 傳下去</p>
 
-<pre><code class="lang-js">&lt;Provider store={store}&gt;
+<pre><code class="lang-js">// 包在 Provider 才能 connect Store
+// v0.13 寫法有一點不一樣
+// 以下是 React v0.14
+&lt;Provider store={store}&gt;
   &lt;MyRootComponent&gt;
 &lt;/Provider&gt;
 </code></pre>
@@ -409,16 +496,14 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                         <p style="font-size: 2em">connect</p>
                     </section>
                     <section>
-                    	<p>connect 用來</p>
                     	<p>把特定的 State 從 Context 裡的 Store Select 出來</p>
-                    	<p>把 Event Handler 綁進來</p>
-                    	<p>並它們當 props 傳下去：</p>
+                    	<p>並把它們當 props 傳下去</p>
 
 <pre><code class="lang-js">class MyComponent extends React.Component {
   render() {
     const { dispatch, user } = this.props;
     // connect 沒給第二個參數時 dispatch 會預設當 props 傳下來
-    //..
+    // ..
   }
 }
 
@@ -428,77 +513,105 @@ expect default connect(state => ({
 </code></pre>
                     </section>
                     <section>
-<pre><code class="lang-js">// 也可以用 decorator 的寫法，不過官方不推薦..
+<pre><code class="lang-js">// 也可以用 decorator 的寫法，不過社群並不推薦..
 @connect(state => ({
   user: state.user
 }))
 expect default class MyComponent extends React.Component {
   render() {
     const { dispatch, user } = this.props;
-    //..
+    // ..
   }
 }
+</code></pre>
+                    </section>
+                    <section>
+						<p>直接包裝 import 進來的 Component</p>
+<pre><code class="lang-js">import MyDumbComponent from '../components/MyDumbComponent';
+
+// 從 State 抽取要傳下去的 Props
+function mapStateToProps(state) {
+  return {
+    user: state.user
+  };
+}
+
+export default connect(mapStateToProps)(MyDumbComponent);
+</code></pre>
+					</section>
+                </section>
+
+                <section data-transition="slide" data-background="#b5533c">
+                	<section>
+                		<p style="font-size: 1.5em">傳遞 ActionCreator 下去</p>
+                	</section>
+                	<section>
+<pre><code class="lang-js">function mapStateToProps(state) {
+  return { user: state.user };
+}
+
+// 把 dispatch 變成 Handler 當成 Props 傳下去
+function mapDispatchToProps(dispatch) {
+  return {
+    sendMessage: (msg) => { dispatch(sendMessage(msg)) }
+  };
+}
+
+class MyComponent extends React.Component {
+  render() {
+    const { user, sendMessage } = this.props;
+    // sendMessage 也會當 props 傳下來
+    // ..
+  }
+}
+
+expect default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
+</code></pre>
+                	</section>
+                </section>
+
+                <section data-transition="slide" data-background="#4d7e65">
+                	<section>
+                        <p style="font-size: 1.5em; color: #B2E1EA">bindActionCreators</p>
+                        <p>Redux 還有這個可以方便使用 ActionCreator 的 util</p>
+                    </section>
+                    <section>
+<pre><code class="lang-js">import { bindActionCreators } from 'redux';
+import MessageActions from '../actions/MessageActions';
+
+function mapStateToProps(state) {
+  return { user: state.user };
+}
+
+// 把 dispatch 變成 Handler 當成 Props 傳下去
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(MessageActions, dispatch);
+} // 把整個 ActionCreator 的 Handler 傳下去
+
+class MyComponent extends React.Component {
+  render() {
+    const { user, sendMessage, deleteMessage } = this.props;
+    // 把整個 ActionCreator 的 Handler 都當 props 傳下來
+    // ..
+  }
+}
+
+expect default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
 </code></pre>
                     </section>
                 </section>
 
                 <section data-transition="slide" data-background="#b5533c">
                     <section>
-                        <p style="font-size: 1.5em">bindActionCreators</p>
-                        <p>Redux 還有一個可以方便去使用 ActionCreator 的 util</p>
+                    	<p style="font-size: 1.5em">connect 其實不只這樣...</p>
                     </section>
                     <section>
-                    	<p>把 dispatch 包進去：</p>
-
-<pre><code class="lang-js">import { bindActionCreators } from 'redux';
-
-@connect(state => ({
-  user: state.user
-}))
-class MySmartComponent extends React.Component {
-
-    render() {
-        const { dispatch, user } = this.props;
-        const actions = bindActionCreators(UserActions, dispatch);
-        return (
-            <MyDumbComponent user={user} {...actions}>
-                {this.props.children}
-            </MyDumbComponent>
-        );
-    }
-}
-</code></pre>
-                    </section>
-                </section>
-
-                <section data-transition="slide" data-background="#4d7e65">
-                    <section>
-                        <p>connect (react-redux v0.8.0)</p>
-                    </section>
-                    <section>
-                    <p>v0.8.0 的 connect 不需要再寫一個 Component，<br />
-
-只要把要傳怎樣的 props 給搞定，<br />
-
-	他會自動幫你包進 Connect Component</p>
-
-<pre><code class="lang-js">function mapStateToProps(state) {
-  return {
-    user: state.user
-  };
-}
-
-export default connect(mapStateToProps)(MyDumbComponent)
-</code></pre>
-
-更簡單了！
-                    </section>
-                    <section>
-                    	<p>`connect` 現在有三個可選參數：`mapStateToProps`, `mapDispatchToProps`, `mergeProps`</p>
+                    	<p>connect 有三個可選參數</p>
+                    	<p>mapStateToProps, mapDispatchToProps, mergeProps</p>
 <ul>
-	<li>mapStateToProps: 跟之前一樣，把 store state 的特定部分當成 props</li>
-	<li>mapDispatchToProps: 把 dispatch 傳進去也變成 props，通常用來把 actionCreators 傳下去</li>
-	<li>mergeProps: 可以指定 stateProps, dispatchProps, parentProps 的合併方式</li>
+	<li><span style="color: #ee5">mapStateToProps:</span> 跟之前一樣，把 Store State 的特定部分當成 Props</li>
+	<li><span style="color: #ee5">mapDispatchToProps:</span> 把 dispatch 傳進去也變成 Props，通常用來把綁定的 actionCreators 傳下去</li>
+	<li><span style="color: #ee5">mergeProps:</span> 可以指定 stateProps, dispatchProps, parentProps 的合併方式</li>
 </ul>
 
 					</section>
@@ -513,32 +626,11 @@ export default connect(mapStateToProps)(MyDumbComponent)
 </code></pre>
                     </section>
                     <section>
-                    	<p>也傳遞包 dispatch 的 actionCreator props 下去：</p>
-
-<pre><code class="lang-js">function mapStateToProps(state) {
-  return {
-    user: state.user
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    onSendMessage: () => dispatch(sendMessage())
-  };
-}
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(MyDumbComponent)
-</code></pre>
-                    </section>
-                    <section>
-                    	<p>最後一個：</p>
+                    	<p>最後可以改變傳下去的 Props 的機會</p>
 
 <pre><code class="lang-js">function mergeProps(stateProps, dispatchProps, parentProps) {
   return {
-    ...stateProps,
+    ...stateProps, // 這樣就可以讓 parentProps 蓋掉其他兩個
     ...dispatchProps,
     ...parentProps
   }
@@ -548,31 +640,6 @@ export default connect(
     mapStateToProps,
     mapDispatchToProps,
     mergeProps
-)(MyDumbComponent)
-</code></pre>
-
-	<p>這樣就可以讓 parentProps 蓋掉其他兩個</p>
-                    </section>
-                </section>
-
-                <section data-transition="slide" data-background="#b5533c">
-                    <section>
-                        <p>v0.8.0 也可以 bindActionCreators</p>
-                    </section>
-                    <section>
-<pre><code class="lang-js">function mapStateToProps(state) {
-  return {
-    user: state.user
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators(UserActions, dispatch);
-}
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
 )(MyDumbComponent)
 </code></pre>
                     </section>
@@ -596,9 +663,21 @@ export default connect(
 						<img src="img/source.png" />
 					</section>
 					<section>
-						<h2>容易學、好擴充</h2>
+						<p>容易學、好擴充</p>
 					</section>
 				</section>
+
+				 <section data-transition="slide" data-background="#b5533c">
+                    <section>
+                    	<p style="font-size: 1.5em">開發工具</p>
+                    </section>
+                    <section>
+                    	<ul>
+                    		<li>redux-devtools</li>
+                    		<li>redux-logger</li>
+                    	</ul>
+                    </section>
+                </section>
 
 				<section data-transition="slide" data-background="#4d7e65" style="text-align: left;">
 					<h1>THE END</h1>
