@@ -507,7 +507,7 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
   }
 }
 
-expect default connect(state => ({
+export default connect(state => ({
   user: state.user
 }))(MyComponent);
 </code></pre>
@@ -517,7 +517,7 @@ expect default connect(state => ({
 @connect(state => ({
   user: state.user
 }))
-expect default class MyComponent extends React.Component {
+export default class MyComponent extends React.Component {
   render() {
     const { dispatch, user } = this.props;
     // ..
@@ -565,7 +565,7 @@ class MyComponent extends React.Component {
   }
 }
 
-expect default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
 </code></pre>
                 	</section>
                 </section>
@@ -596,7 +596,7 @@ class MyComponent extends React.Component {
   }
 }
 
-expect default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
 </code></pre>
                     </section>
                 </section>
