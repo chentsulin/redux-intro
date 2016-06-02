@@ -69,6 +69,10 @@ a { color: white !important; text-decoration: underline !important;}
 						<img src="img/mvc.png" />
 					</section>
 					<section>
+						<p style="text-align: left; color: #ee5"><a href="https://facebook.github.io/react/blog/2015/10/07/react-v0.14.html#upgrade-guide" target="_blank">the Facebook codebase has over 15,000 React components</a>
+						<p style="text-align: right; color: #ee5""> - 2015/10/07</p>
+					</section>
+					<section>
 						<p>詳細的可以參考這個影片：<br /><a href="https://www.youtube.com/watch?v=nYkdrAPrdcw" target="_blank">Rethinking Web App Development at Facebook</a></p>
 					</section>
 				</section>
@@ -144,13 +148,13 @@ a { color: white !important; text-decoration: underline !important;}
 
 				<section data-transition="slide" data-background="#b5533c">
 					<section>
-						<p>唯一真相來源 (Single source of truth)</p>
+						<p style="font-size: 1.5em">唯一真相來源 <br />(Single source of truth)</p>
 					</section>
 					<section>
-						<p>State 是唯讀的 (State is read-only)</p>
+						<p style="font-size: 1.5em">State 是唯讀的 <br /(State is read-only)</p>
 					</section>
 					<section>
-						<p>變更被寫成 pure functions <br />(Changes are made with pure functions)</p>
+						<p style="font-size: 1.5em">變更被寫成 pure functions <br />(Changes are made with pure functions)</p>
 					</section>
 					<section>
 						<p>詳細可參考<a href="http://chentsulin.github.io/redux/docs/introduction/ThreePrinciples.html" target="_blank">這裡</a></p>
@@ -181,7 +185,7 @@ a { color: white !important; text-decoration: underline !important;}
                         <p>包括 meta, error 等欄位</p>
                     </section>
                     <section>
-                    	<p>可以宣告為常數</p>
+                    	<p>type 可以宣告為常數</p>
                     	<p>放在 ActionCreator 或 額外的 actionTypes 檔案</p>
 <pre><code class="lang-js">export const ADD_TODO = 'ADD_TODO';
 export const COMPLETE_TODO = 'COMPLETE_TODO';
@@ -242,10 +246,10 @@ export const SET_VISIBILITY_FILTER = 'SET_VISIBILITY_FILTER';</code></pre>
 dispatch(sendMessage('Hello'));</code></pre>
                     </section>
                     <section>
-                    	<p>使用</p>
+                    	<p>使用 Middleware </p><p>可以 dispatch 除了一般 action 以外的東西</p>
                     	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">Thunk Middleware (redux-thunk)</a></p>
-                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blankredu">Promise Middleware (redux-promise)</a></p>
-	                    <p>就可以延伸的 ActionCreator 的功能</p>
+                    	<p><a href="https://github.com/acdlite/redux-promise" target="_blank">Promise Middleware (redux-promise)</a></p>
+                    	<p><a href="https://github.com/yelouafi/redux-saga" target="_blank">Saga Middleware (redux-promise)</a></p>
 	                    <p>這邊先不做敘述</p>
                     </section>
                 </section>
@@ -271,9 +275,9 @@ const newState = reducer(previousState, action);</code></pre>
 	                    <p>可以更簡潔的表達如何變更 State</p>
                     </section>
                     <section>
-                    <p>這是個沒有 Side Effect 的 Function</p>
-                    <p>不要去改 previousState</p>
-                    <p>會使 Time Travel 等需要前面 State 的功能壞掉</p>
+	                    <p>這是個沒有 Side Effect 的 Function</p>
+	                    <p>不要去改 previousState</p>
+	                    <p>會使 Time Travel 等需要前面 State 的功能壞掉</p>
 
 <pre><code class="lang-js">const initialState = { message: '' };
 
@@ -407,20 +411,15 @@ const unsubscribe = store.subscribe(() =>
 
 <pre><code class="lang-js">import { createStore, applyMiddleware } from 'redux';
 
-const store =
-applyMiddleware(promise, thunk, observable)(createStore)(reducer);
-// applyMiddleware 可以 Decorate createStore
+const store = createStore(
+  reducer,
+  applyMiddleware(promise, thunk, observable)
+);
+// applyMiddleware 可以 decorate createStore
 </code></pre>
                     </section>
                     <section>
                         <p><code>dispatch => dispatch'</code></p>
-                    </section>
-                    <section>
-                        <p>讓 dispatch 經過一個個的 Middleware Decorate</p>
-<pre><code class="lang-js">const store =
-applyMiddleware(promise, thunk, observable)(createStore)(reducer);
-// store.dispatch => promise(thunk(observable(store.dispatch)));
-</code></pre>
                     </section>
                     <section>
                     	<p><a href="https://github.com/gaearon/redux-thunk" target="_blank">redux-thunk</a> 這個 Middleware</p>
@@ -482,8 +481,6 @@ applyMiddleware(promise, thunk, observable)(createStore)(reducer);
                     	<p>並把 Store 用 React Context 傳下去</p>
 
 <pre><code class="lang-js">// 包在 Provider 才能 connect Store
-// v0.13 寫法有一點不一樣
-// 以下是 React v0.14
 &lt;Provider store={store}&gt;
   &lt;MyRootComponent&gt;
 &lt;/Provider&gt;
@@ -513,21 +510,8 @@ export default connect(state => ({
 </code></pre>
                     </section>
                     <section>
-<pre><code class="lang-js">// 也可以用 decorator 的寫法，不過社群並不推薦..
-@connect(state => ({
-  user: state.user
-}))
-export default class MyComponent extends React.Component {
-  render() {
-    const { dispatch, user } = this.props;
-    // ..
-  }
-}
-</code></pre>
-                    </section>
-                    <section>
 						<p>直接包裝 import 進來的 Component</p>
-<pre><code class="lang-js">import MyDumbComponent from '../components/MyDumbComponent';
+<pre><code class="lang-js">import PresentationalComponent from '../components/PresentationalComponent';
 
 // 從 State 抽取要傳下去的 Props
 function mapStateToProps(state) {
@@ -536,7 +520,7 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(MyDumbComponent);
+export default connect(mapStateToProps)(PresentationalComponent);
 </code></pre>
 					</section>
                 </section>
